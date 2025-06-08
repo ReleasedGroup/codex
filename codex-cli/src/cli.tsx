@@ -160,7 +160,7 @@ const cli = meow(
         type: "string",
         aliases: ["a"],
         description:
-          "Determine the approval mode for Codex (default: suggest) Values: suggest, auto-edit, full-auto",
+          "Determine the approval mode for Codex (default: suggest) Values: suggest, auto-edit, full-auto, unsafe",
       },
       writableRoot: {
         type: "string",
@@ -561,6 +561,9 @@ if (cli.flags.quiet) {
   const quietApprovalPolicy: ApprovalPolicy =
     cli.flags.fullAuto || cli.flags.approvalMode === "full-auto"
       ? AutoApprovalMode.FULL_AUTO
+      : cli.flags.dangerouslyAutoApproveEverything ||
+          cli.flags.approvalMode === "unsafe"
+        ? AutoApprovalMode.UNSAFE
       : cli.flags.autoEdit || cli.flags.approvalMode === "auto-edit"
         ? AutoApprovalMode.AUTO_EDIT
         : config.approvalMode || AutoApprovalMode.SUGGEST;
@@ -592,6 +595,9 @@ if (cli.flags.quiet) {
 const approvalPolicy: ApprovalPolicy =
   cli.flags.fullAuto || cli.flags.approvalMode === "full-auto"
     ? AutoApprovalMode.FULL_AUTO
+    : cli.flags.dangerouslyAutoApproveEverything ||
+        cli.flags.approvalMode === "unsafe"
+      ? AutoApprovalMode.UNSAFE
     : cli.flags.autoEdit || cli.flags.approvalMode === "auto-edit"
       ? AutoApprovalMode.AUTO_EDIT
       : config.approvalMode || AutoApprovalMode.SUGGEST;

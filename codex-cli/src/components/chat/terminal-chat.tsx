@@ -64,6 +64,7 @@ const colorsByPolicy: Record<ApprovalPolicy, ColorName | undefined> = {
   "suggest": undefined,
   "auto-edit": "greenBright",
   "full-auto": "green",
+  "unsafe": "red",
 };
 
 /**

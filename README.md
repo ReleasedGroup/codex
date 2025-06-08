@@ -19,17 +19,25 @@ This is the home of the **Codex CLI**, which is a coding agent from OpenAI that 
   - [OpenAI API Users](#openai-api-users)
   - [OpenAI Plus/Pro Users](#openai-pluspro-users)
 - [Why Codex?](#why-codex)
-- [Security model & permissions](#security-model--permissions)
+- [Security model \& permissions](#security-model--permissions)
   - [Platform sandboxing details](#platform-sandboxing-details)
 - [System requirements](#system-requirements)
 - [CLI reference](#cli-reference)
-- [Memory & project docs](#memory--project-docs)
+- [Memory \& project docs](#memory--project-docs)
 - [Non-interactive / CI mode](#non-interactive--ci-mode)
 - [Model Context Protocol (MCP)](#model-context-protocol-mcp)
 - [Tracing / verbose logging](#tracing--verbose-logging)
 - [Recipes](#recipes)
 - [Installation](#installation)
   - [DotSlash](#dotslash)
+- [Configuration guide](#configuration-guide)
+  - [Basic configuration parameters](#basic-configuration-parameters)
+  - [Custom AI provider configuration](#custom-ai-provider-configuration)
+  - [History configuration](#history-configuration)
+  - [Configuration examples](#configuration-examples)
+  - [Full configuration example](#full-configuration-example)
+  - [Custom instructions](#custom-instructions)
+  - [Environment variables setup](#environment-variables-setup)
 - [Configuration](#configuration)
 - [FAQ](#faq)
 - [Zero data retention (ZDR) usage](#zero-data-retention-zdr-usage)
@@ -44,7 +52,7 @@ This is the home of the **Codex CLI**, which is a coding agent from OpenAI that 
   - [Contributor license agreement (CLA)](#contributor-license-agreement-cla)
     - [Quick fixes](#quick-fixes)
   - [Releasing `codex`](#releasing-codex)
-- [Security & responsible AI](#security--responsible-ai)
+- [Security \& responsible AI](#security--responsible-ai)
 - [License](#license)
 
 <!-- End ToC -->
@@ -380,6 +388,155 @@ cargo test
 
 ---
 
+## Configuration guide
+
+Codex configuration files can be placed in the `~/.codex/` directory, supporting both YAML and JSON formats.
+
+### Basic configuration parameters
+
+| Parameter           | Type    | Default    | Description                      | Available Options                                                                              |
+| ------------------- | ------- | ---------- | -------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `model`             | string  | `o4-mini`  | AI model to use                  | Any model name supporting OpenAI API                                                           |
+| `approvalMode`      | string  | `suggest`  | AI assistant's permission mode   | `suggest` (suggestions only)<br>`auto-edit` (automatic edits)<br>`full-auto` (fully automatic)<br>`unsafe` (no prompts or sandbox) |
+| `fullAutoErrorMode` | string  | `ask-user` | Error handling in full-auto mode | `ask-user` (prompt for user input)<br>`ignore-and-continue` (ignore and proceed)               |
+| `notify`            | boolean | `true`     | Enable desktop notifications     | `true`/`false`                                                                                 |
+
+### Custom AI provider configuration
+
+In the `providers` object, you can configure multiple AI service providers. Each provider requires the following parameters:
+
+| Parameter | Type   | Description                             | Example                       |
+| --------- | ------ | --------------------------------------- | ----------------------------- |
+| `name`    | string | Display name of the provider            | `"OpenAI"`                    |
+| `baseURL` | string | API service URL                         | `"https://api.openai.com/v1"` |
+| `envKey`  | string | Environment variable name (for API key) | `"OPENAI_API_KEY"`            |
+
+### History configuration
+
+In the `history` object, you can configure conversation history settings:
+
+| Parameter           | Type    | Description                                            | Example Value |
+| ------------------- | ------- | ------------------------------------------------------ | ------------- |
+| `maxSize`           | number  | Maximum number of history entries to save              | `1000`        |
+| `saveHistory`       | boolean | Whether to save history                                | `true`        |
+| `sensitivePatterns` | array   | Patterns of sensitive information to filter in history | `[]`          |
+
+### Configuration examples
+
+1. YAML format (save as `~/.codex/config.yaml`):
+
+```yaml
+model: o4-mini
+approvalMode: suggest
+fullAutoErrorMode: ask-user
+notify: true
+```
+
+2. JSON format (save as `~/.codex/config.json`):
+
+```json
+{
+  "model": "o4-mini",
+  "approvalMode": "suggest",
+  "fullAutoErrorMode": "ask-user",
+  "notify": true
+}
+```
+
+### Full configuration example
+
+Below is a comprehensive example of `config.json` with multiple custom providers:
+
+```json
+{
+  "model": "o4-mini",
+  "provider": "openai",
+  "providers": {
+    "openai": {
+      "name": "OpenAI",
+      "baseURL": "https://api.openai.com/v1",
+      "envKey": "OPENAI_API_KEY"
+    },
+    "azure": {
+      "name": "AzureOpenAI",
+      "baseURL": "https://YOUR_PROJECT_NAME.openai.azure.com/openai",
+      "envKey": "AZURE_OPENAI_API_KEY"
+    },
+    "openrouter": {
+      "name": "OpenRouter",
+      "baseURL": "https://openrouter.ai/api/v1",
+      "envKey": "OPENROUTER_API_KEY"
+    },
+    "gemini": {
+      "name": "Gemini",
+      "baseURL": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "envKey": "GEMINI_API_KEY"
+    },
+    "ollama": {
+      "name": "Ollama",
+      "baseURL": "http://localhost:11434/v1",
+      "envKey": "OLLAMA_API_KEY"
+    },
+    "mistral": {
+      "name": "Mistral",
+      "baseURL": "https://api.mistral.ai/v1",
+      "envKey": "MISTRAL_API_KEY"
+    },
+    "deepseek": {
+      "name": "DeepSeek",
+      "baseURL": "https://api.deepseek.com",
+      "envKey": "DEEPSEEK_API_KEY"
+    },
+    "xai": {
+      "name": "xAI",
+      "baseURL": "https://api.x.ai/v1",
+      "envKey": "XAI_API_KEY"
+    },
+    "groq": {
+      "name": "Groq",
+      "baseURL": "https://api.groq.com/openai/v1",
+      "envKey": "GROQ_API_KEY"
+    },
+    "arceeai": {
+      "name": "ArceeAI",
+      "baseURL": "https://conductor.arcee.ai/v1",
+      "envKey": "ARCEEAI_API_KEY"
+    }
+  },
+  "history": {
+    "maxSize": 1000,
+    "saveHistory": true,
+    "sensitivePatterns": []
+  }
+}
+```
+
+### Custom instructions
+
+You can create a `~/.codex/AGENTS.md` file to define custom guidance for the agent:
+
+```markdown
+- Always respond with emojis
+- Only use git commands when explicitly requested
+```
+
+### Environment variables setup
+
+For each AI provider, you need to set the corresponding API key in your environment variables. For example:
+
+```bash
+# OpenAI
+export OPENAI_API_KEY="your-api-key-here"
+
+# Azure OpenAI
+export AZURE_OPENAI_API_KEY="your-azure-api-key-here"
+export AZURE_OPENAI_API_VERSION="2025-03-01-preview" (Optional)
+
+# OpenRouter
+export OPENROUTER_API_KEY="your-openrouter-key-here"
+
+# Similarly for other providers
+```
 ## Configuration
 
 Codex supports a rich set of configuration options documented in [`codex-rs/config.md`](./codex-rs/config.md).

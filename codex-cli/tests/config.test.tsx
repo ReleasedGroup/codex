@@ -138,21 +138,21 @@ test("loads and saves approvalMode correctly", () => {
   // Modify approvalMode and save
   const updatedConfig = {
     ...loadedConfig,
-    approvalMode: AutoApprovalMode.FULL_AUTO,
+    approvalMode: AutoApprovalMode.UNSAFE,
   };
 
   saveConfig(updatedConfig, testConfigPath, testInstructionsPath);
 
   // Verify saved config contains updated approvalMode
   expect(memfs[testConfigPath]).toContain(
-    `"approvalMode": "${AutoApprovalMode.FULL_AUTO}"`,
+    `"approvalMode": "${AutoApprovalMode.UNSAFE}"`,
   );
 
   // Load again and verify updated value
   const reloadedConfig = loadConfig(testConfigPath, testInstructionsPath, {
     disableProjectDoc: true,
   });
-  expect(reloadedConfig.approvalMode).toBe(AutoApprovalMode.FULL_AUTO);
+  expect(reloadedConfig.approvalMode).toBe(AutoApprovalMode.UNSAFE);
 });
 
 test("loads and saves providers correctly", () => {
