@@ -61,7 +61,11 @@ export type ApprovalPolicy =
    * where network access is disabled and writes are limited to a specific set
    * of paths.
    */
-  | "full-auto";
+  | "full-auto"
+  /**
+   * Automatically approve everything without sandboxing.
+   */
+  | "unsafe";
 
 /**
  * Tries to assess whether a command is safe to run, though may defer to the
@@ -128,6 +132,13 @@ export function canAutoApprove(
             group: "Running commands",
             runInSandbox: true,
           };
+        case "unsafe":
+          return {
+            type: "auto-approve",
+            reason: "Unsafe mode",
+            group: "Running commands",
+            runInSandbox: false,
+          };
         case "suggest":
         case "auto-edit":
           // In all other modes, since we cannot reason about the command, we
@@ -163,7 +174,14 @@ export function canAutoApprove(
         group: "Running commands",
         runInSandbox: true,
       }
-    : { type: "ask-user" };
+    : policy === "unsafe"
+      ? {
+          type: "auto-approve",
+          reason: "Unsafe mode",
+          group: "Running commands",
+          runInSandbox: false,
+        }
+      : { type: "ask-user" };
 }
 
 function canAutoApproveApplyPatch(
@@ -174,6 +192,9 @@ function canAutoApproveApplyPatch(
 ): SafetyAssessment {
   switch (policy) {
     case "full-auto":
+      // Continue to see if this can be auto-approved.
+      break;
+    case "unsafe":
       // Continue to see if this can be auto-approved.
       break;
     case "suggest":
@@ -210,10 +231,18 @@ function canAutoApproveApplyPatch(
         runInSandbox: true,
         applyPatch: { patch: applyPatchArg },
       }
-    : {
-        type: "ask-user",
-        applyPatch: { patch: applyPatchArg },
-      };
+    : policy === "unsafe"
+      ? {
+          type: "auto-approve",
+          reason: "Unsafe mode",
+          group: "Editing",
+          runInSandbox: false,
+          applyPatch: { patch: applyPatchArg },
+        }
+      : {
+          type: "ask-user",
+          applyPatch: { patch: applyPatchArg },
+        };
 }
 
 /**

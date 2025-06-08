@@ -28,6 +28,10 @@ export function OnboardingApprovalMode(): React.ReactElement {
               "Auto-approve file reads, edits, and running commands network-disabled",
             value: AutoApprovalMode.FULL_AUTO,
           },
+          {
+            label: "Auto-approve everything without prompts or sandbox",
+            value: AutoApprovalMode.UNSAFE,
+          },
         ]}
       />
     </Box>
