@@ -11,9 +11,9 @@ rec {
     nodejs      = node;
     npmInstallFlags = [ "--frozen-lockfile" ];
     meta = with pkgs.lib; {
-      description = "OpenAI Codex command‑line interface";
+      description = "ReleasedGroup Codex command‑line interface";
       license     = licenses.asl20;
-      homepage    = "https://github.com/openai/codex";
+      homepage    = "https://github.com/ReleasedGroup/codex";
     };
   };
   devShell = pkgs.mkShell {

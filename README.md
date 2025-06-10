@@ -1,7 +1,7 @@
-<h1 align="center">OpenAI Codex CLI</h1>
+<h1 align="center">ReleasedGroup Codex CLI</h1>
 <p align="center">Lightweight coding agent that runs in your terminal</p>
 
-<p align="center"><code>npm i -g @openai/codex</code></p>
+<p align="center"><code>npm i -g @releasedgroup/codex</code></p>
 
 ![Codex demo GIF using: codex "explain this codebase to me"](./.github/demo.gif)
 
@@ -15,11 +15,11 @@
 - [Experimental technology disclaimer](#experimental-technology-disclaimer)
 - [Quickstart](#quickstart)
 - [Why Codex?](#why-codex)
-- [Security model & permissions](#security-model--permissions)
+- [Security model \& permissions](#security-model--permissions)
   - [Platform sandboxing details](#platform-sandboxing-details)
 - [System requirements](#system-requirements)
 - [CLI reference](#cli-reference)
-- [Memory & project docs](#memory--project-docs)
+- [Memory \& project docs](#memory--project-docs)
 - [Non-interactive / CI mode](#non-interactive--ci-mode)
 - [Tracing / verbose logging](#tracing--verbose-logging)
 - [Recipes](#recipes)
@@ -49,7 +49,7 @@
   - [Releasing `codex`](#releasing-codex)
   - [Alternative build options](#alternative-build-options)
     - [Nix flake development](#nix-flake-development)
-- [Security & responsible AI](#security--responsible-ai)
+- [Security \& responsible AI](#security--responsible-ai)
 - [License](#license)
 
 <!-- End ToC -->
@@ -169,8 +169,8 @@ Codex lets you decide _how much autonomy_ the agent receives and auto-approval p
 | ------------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | **Suggest** <br>(default) | <li>Read any file in the repo                                                                       | <li>**All** file writes/patches<li> **Any** arbitrary shell commands (aside from reading files) |
 | **Auto Edit**             | <li>Read **and** apply-patch writes to files                                                        | <li>**All** shell commands                                                                      |
-| **Full Auto**             | <li>Read/write files <li> Execute shell commands (network disabled, writes limited to your workdir) | - |
-| **Unsafe**                | <li>Read/write files <li> Execute commands without prompts or sandbox | - |
+| **Full Auto**             | <li>Read/write files <li> Execute shell commands (network disabled, writes limited to your workdir) | -                                                                                               |
+| **Unsafe**                | <li>Read/write files <li> Execute commands without prompts or sandbox                               | -                                                                                               |
 
 In **Full Auto** every command is run **network-disabled** and confined to the
 current working directory (plus temporary files) for defense-in-depth. Codex
@@ -334,12 +334,12 @@ Codex configuration files can be placed in the `~/.codex/` directory, supporting
 
 ### Basic configuration parameters
 
-| Parameter           | Type    | Default    | Description                      | Available Options                                                                              |
-| ------------------- | ------- | ---------- | -------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `model`             | string  | `o4-mini`  | AI model to use                  | Any model name supporting OpenAI API                                                           |
+| Parameter           | Type    | Default    | Description                      | Available Options                                                                                                                  |
+| ------------------- | ------- | ---------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `model`             | string  | `o4-mini`  | AI model to use                  | Any model name supporting OpenAI API                                                                                               |
 | `approvalMode`      | string  | `suggest`  | AI assistant's permission mode   | `suggest` (suggestions only)<br>`auto-edit` (automatic edits)<br>`full-auto` (fully automatic)<br>`unsafe` (no prompts or sandbox) |
-| `fullAutoErrorMode` | string  | `ask-user` | Error handling in full-auto mode | `ask-user` (prompt for user input)<br>`ignore-and-continue` (ignore and proceed)               |
-| `notify`            | boolean | `true`     | Enable desktop notifications     | `true`/`false`                                                                                 |
+| `fullAutoErrorMode` | string  | `ask-user` | Error handling in full-auto mode | `ask-user` (prompt for user input)<br>`ignore-and-continue` (ignore and proceed)                                                   |
+| `notify`            | boolean | `true`     | Enable desktop notifications     | `true`/`false`                                                                                                                     |
 
 ### Custom AI provider configuration
 
