@@ -205,26 +205,24 @@ And it's **fully open-source** so you can see and contribute to how it develops!
 
 ## Security model & permissions
 
-Codex lets you decide _how much autonomy_ you want to grant the agent. The following options can be configured independently:
+Codex lets you decide _how much autonomy_ the agent receives and auto-approval policy via the
+`--approval-mode` flag (or the interactive onboarding prompt):
 
-- [`approval_policy`](./codex-rs/config.md#approval_policy) determines when you should be prompted to approve whether Codex can execute a command
-- [`sandbox`](./codex-rs/config.md#sandbox) determines the _sandbox policy_ that Codex uses to execute untrusted commands
+| Mode                      | What the agent may do without asking                                                                | Still requires approval                                                                         |
+| ------------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| **Suggest** <br>(default) | <li>Read any file in the repo                                                                       | <li>**All** file writes/patches<li> **Any** arbitrary shell commands (aside from reading files) |
+| **Auto Edit**             | <li>Read **and** apply-patch writes to files                                                        | <li>**All** shell commands                                                                      |
+| **Full Auto**             | <li>Read/write files <li> Execute shell commands (network disabled, writes limited to your workdir) | -                                                                                               |
+| **Unsafe**                | <li>Read/write files <li> Execute commands without prompts or sandbox                               | -                                                                                               |
 
-By default, Codex runs with `approval_policy = "untrusted"` and `sandbox.mode = "read-only"`, which means that:
+In **Full Auto** every command is run **network-disabled** and confined to the
+current working directory (plus temporary files) for defense-in-depth. Codex
+will also show a warning/confirmation if you start in **auto-edit** or
+**full-auto** while the directory is _not_ tracked by Git, so you always have a
+safety net.
 
-- The user is prompted to approve every command not on the set of "trusted" commands built into Codex (`cat`, `ls`, etc.)
-- Approved commands are run outside of a sandbox because user approval implies "trust," in this case.
-
-Though running Codex with the `--full-auto` option changes the configuration to `approval_policy = "on-failure"` and `sandbox.mode = "workspace-write"`, which means that:
-
-- Codex does not initially ask for user approval before running an individual command.
-- Though when it runs a command, it is run under a sandbox in which:
-  - It can read any file on the system.
-  - It can only write files under the current directory (or the directory specified via `--cd`).
-  - Network requests are completely disabled.
-- Only if the command exits with a non-zero exit code will it ask the user for approval. If granted, it will re-attempt the command outside of the sandbox. (A common case is when Codex cannot `npm install` a dependency because that requires network access.)
-
-Again, these two options can be configured independently. For example, if you want Codex to perform an "exploration" where you are happy for it to read anything it wants but you never want to be prompted, you could run Codex with `approval_policy = "never"` and `sandbox.mode = "read-only"`.
+Coming soon: you'll be able to whitelist specific commands to auto-execute with
+the network enabled, once we're confident in additional safeguards.
 
 ### Platform sandboxing details
 
@@ -394,12 +392,12 @@ Codex configuration files can be placed in the `~/.codex/` directory, supporting
 
 ### Basic configuration parameters
 
-| Parameter           | Type    | Default    | Description                      | Available Options                                                                              |
-| ------------------- | ------- | ---------- | -------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `model`             | string  | `o4-mini`  | AI model to use                  | Any model name supporting OpenAI API                                                           |
+| Parameter           | Type    | Default    | Description                      | Available Options                                                                                                                  |
+| ------------------- | ------- | ---------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `model`             | string  | `o4-mini`  | AI model to use                  | Any model name supporting OpenAI API                                                                                               |
 | `approvalMode`      | string  | `suggest`  | AI assistant's permission mode   | `suggest` (suggestions only)<br>`auto-edit` (automatic edits)<br>`full-auto` (fully automatic)<br>`unsafe` (no prompts or sandbox) |
-| `fullAutoErrorMode` | string  | `ask-user` | Error handling in full-auto mode | `ask-user` (prompt for user input)<br>`ignore-and-continue` (ignore and proceed)               |
-| `notify`            | boolean | `true`     | Enable desktop notifications     | `true`/`false`                                                                                 |
+| `fullAutoErrorMode` | string  | `ask-user` | Error handling in full-auto mode | `ask-user` (prompt for user input)<br>`ignore-and-continue` (ignore and proceed)                                                   |
+| `notify`            | boolean | `true`     | Enable desktop notifications     | `true`/`false`                                                                                                                     |
 
 ### Custom AI provider configuration
 
@@ -537,6 +535,7 @@ export OPENROUTER_API_KEY="your-openrouter-key-here"
 
 # Similarly for other providers
 ```
+
 ## Configuration
 
 Codex supports a rich set of configuration options documented in [`codex-rs/config.md`](./codex-rs/config.md).
